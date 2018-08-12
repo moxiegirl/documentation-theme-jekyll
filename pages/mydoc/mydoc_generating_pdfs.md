@@ -11,19 +11,58 @@ folder: mydoc
 
 
 ## PDF overview
-This process for creating a PDF relies on Prince XML to transform the HTML content into PDF. Prince costs about $500 per license. That might seem like a lot, but if you're creating a PDF, you're probably working for a company that sells a product, so you likely have access to some resources.
+This process for creating a PDF relies on Prince XML to transform the HTML content into PDF. Prince costs about $500 per license. That might seem like a lot, but if you're creating a PDF, you're probably working for a company that sells a product, so you likely have access to some resources. There's also a free license that prints a small "P" watermark on your title page, so if you're fine with that, great.
 
-The basic approach is to generate a list of all pages that need to be added to the PDF, and then add leverage Prince to package them up into a PDF.
-
-It may seem like the setup is somewhat cumbersome, but it doesn't take long. Once you set it up, building a pdf is just a matter of running a couple of commands.
-
-Also, creating a PDF this way gives you a lot more control and customization capabilities than with other methods for creating PDFs. If you know CSS, you can entirely customize the output.
+The basic approach is to generate a list of all web pages that need to be added to the PDF, and then add leverage Prince to package them up into a PDF. Once you set it up, building a pdf is just a matter of running a couple of commands. Also, creating a PDF this way gives you a lot more control and customization capabilities than with other methods for creating PDFs. If you know CSS, you can entirely customize the output.
 
 ## Demo
 
 You can see an example of the finished product here:
 
 <a target="\_blank" class="noCrossRef" href="{{ "pdf/mydoc.pdf"}}"><button type="button" class="btn btn-default" aria-label="Left Align"><span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span> PDF Download</button></a>
+
+To generate the PDF, browse to the theme's directory in your terminal and run this script:
+
+```bash
+. pdf-mydoc.sh
+```
+
+This builds a PDF for the documentation in the theme. Look in the **pdf** folder for the output, and see the "last generated date" to confirm that you generated the PDF.
+
+To build a PDF for the other sample projects, run these commands:
+
+```bash
+. pdf-product1.sh
+```
+
+or
+
+```bash
+. pdf-product2.sh
+```
+
+You can see the details of the script in these files in the theme's root directory. For example, open pdf-mydoc.sh. It contains the following:
+
+```bash
+# Note that .sh scripts work only on Mac. If you're on Windows, install Git Bash and use that as your client.
+
+echo 'Kill all Jekyll instances'
+kill -9 $(ps aux | grep '[j]ekyll' | awk '{print $2}')
+clear
+
+echo "Building PDF-friendly HTML site for Mydoc ...";
+bundle exec jekyll serve --detach --config _config.yml,pdfconfigs/config_mydoc_pdf.yml;
+echo "done";
+
+echo "Building the PDF ...";
+prince --javascript --input-list=_site/pdfconfigs/prince-list.txt -o pdf/mydoc.pdf;
+
+echo "Done. Look in the pdf directory to see if it printed successfully."
+```
+
+After stopping all Jekyll instances, we build Jekyll using a special configuration file that specifies a unique stylesheet. The build contains a file (prince-list.txt) that contains a list of all pages to be included in the PDF. We feed this list into a Prince command to build the PDF.
+
+The following sections explain more about the setup.
 
 ## 1. Set up Prince
 
@@ -54,17 +93,21 @@ defaults:
       layout: "page_print"
       comments: true
       search: true
+
+pdf_sidebar: mydoc_sidebar
 ```
 
 {% include note.html content="Although you're creating a PDF, you must still build an HTML web target before running Prince. Prince will pull from the HTML files and from the file-list for the TOC." %}
 
 Note that the default page layout specified by this configuration file is `page_print`. This layout strips out all the sections that shouldn't appear in the print PDF, such as the sidebar and top navigation bar.
 
-Also note that there's a `output: pdf` toggle in case you want to make some of your content unique to PDF output. For example, you could add conditional logic that checks whether `site.output` is `pdf` or `web`. If it's `pdf`, then include information only for the PDF, and so on. If you're using nav tabs, you'll definitely want to create an alternative experience in the PDF.
+Also note that there's a `output: pdf` property in case you want to make some of your content unique to PDF output. For example, you could add conditional logic that checks whether `site.output` is `pdf` or `web`. If it's `pdf`, then include information only for the PDF, and so on. If you're using nav tabs, you'll definitely want to create an alternative experience in the PDF.
 
 In the configuration file, customize the values for the `print_title` and `print_subtitle` that you want. These will appear on the title page of the PDF.
 
-## 3. Make sure your sidebar_doc.yml file has a titlepage.html and tocpage.html
+We will access this configure file in the PDF generation script.
+
+## 3. Make sure your sidebar data file has titlepage.html and tocpage.html entries
 
 There are two template pages in the root directory that are critical to the PDF:
 
@@ -74,18 +117,18 @@ There are two template pages in the root directory that are critical to the PDF:
 These pages should appear in your sidebar YML file (in this product, mydoc_sidebar.yml):
 
 ```yaml
+- title:
+  output: pdf
+  type: frontmatter
+  folderitems:
   - title:
+    url: /titlepage.html
     output: pdf
     type: frontmatter
-    folderitems:
-    - title:
-      url: /titlepage/
-      output: pdf
-      type: frontmatter
-    - title:
-      url: /tocpage/
-      output: pdf
-      type: frontmatter
+  - title:
+    url: /tocpage.html
+    output: pdf
+    type: frontmatter
 ```
 
 Leave these pages here in your sidebar. (The `output: pdf` property means they won't appear in your online TOC because the conditional logic of the sidebar.html checks whether `web` is equal to `pdf` or not before including the item in the web version of the content.)
@@ -288,9 +331,9 @@ This gets the current page:
 
 Because the theme uses JavaScript in the CSS, you have to add the `--javascript` tag in the Prince command (detailed later on this page).
 
-## 5. Customize the PDF script
+## 5. Customize and run the PDF script
 
-Duplicate the pdf-mydocf.sh file in the root directory and customize it for your specific configuration files.
+Duplicate the pdf-mydoc.sh file in the root directory and customize it for your specific configuration files.
 
 ```
 echo 'Killing all Jekyll instances'
@@ -302,7 +345,7 @@ jekyll serve --detach --config _config.yml,pdfconfigs/config_mydoc_pdf.yml;
 echo "done";
 
 echo "Building the PDF ...";
-prince --javascript --input-list=_site/pdfconfigs/prince-list.txt -o _pdf/mydoc.pdf;
+prince --javascript --input-list=_site/pdfconfigs/prince-list.txt -o pdf/mydoc.pdf;
 echo "done";
 ```
 
@@ -340,7 +383,7 @@ You can add a download button for your PDF using some Bootstrap button code:
 
 Here's what that looks like:
 
-<a target="_blank" class="noCrossRef" href={{ "pdf/mydoc.pdf"}}"><button type="button" class="btn btn-default" aria-label="Left Align"><span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span> PDF Download</button></a>
+<a target="\_blank" class="noCrossRef" href={{ "pdf/mydoc.pdf"}}"><button type="button" class="btn btn-default" aria-label="Left Align"><span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span> PDF Download</button></a>
 
 ## JavaScript conflicts
 
@@ -356,13 +399,11 @@ You need to conditionalize out any JavaScript from your PDF web output before bu
 
 Then surround the JavaScript with conditional tags like this:
 
-{% raw %}
 ```
-{% unless site.output == "pdf" %}
+{% raw %}{% unless site.output == "pdf" %}
 javascript content here ...
-{% endunless %}
+{% endunless %}{% endraw %}
 ```
-{% endraw %}
 
 For more detail about using `unless` in conditional logic, see [Conditional logic][mydoc_conditional_logic]. What this code means is "run this code unless this value is the case."
 

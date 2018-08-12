@@ -11,11 +11,11 @@ entries:
     type: frontmatter
     folderitems:
     - title:
-      url: /titlepage
+      url: /titlepage.html
       output: pdf
       type: frontmatter
     - title:
-      url: /tocpage
+      url: /tocpage.html
       output: pdf
       type: frontmatter
 
@@ -218,10 +218,6 @@ entries:
 
     - title: Pushing builds to server
       url: /mydoc_push_build_to_server.html
-      output: web, pdf
-
-    - title: Getting around the password prompts in SCP
-      url: /mydoc_no_password_prompts_scp.html
       output: web, pdf
 
     - title: Publishing on Github Pages

@@ -1,5 +1,5 @@
 ---
-title: Getting started with the Documentation Theme for Jekyll
+title: "Getting started with the Documentation Theme for Jekyll"
 keywords: sample homepage
 tags: [getting_started]
 sidebar: mydoc_sidebar
@@ -7,13 +7,15 @@ permalink: index.html
 summary: These brief instructions will help you get started quickly with the theme. The other topics in this help provide additional information and detail about working with other aspects of this theme and Jekyll.
 ---
 
+{% include note.html content="If you're cloning this theme, you're probably writing documentation of some kind. I have a blog on technical writing here called <a alt='technical writing blog' href='http://idratherbewriting.com'>I'd Rather Be Writing</a>. If you'd like to stay updated with the latest trends, best practices, and other methods for writing documentation, consider <a href='https://tinyletter.com/tomjoht'>subscribing</a>. I also have a site on <a href='http://idratherbewriting.com/learnapidoc'>writing API documentation</a>." %}
+
 ## Build the Theme
 
 Follow these instructions to build the theme.
 
 ### 1. Download the theme
 
-First download or clone the theme from the [Github repo](https://github.com/tomjohnson1492/documentation-theme-jekyll). Most likely you won't be pulling in updates once you start customizing the theme, so downloading the theme (instead of cloning it) probably makes the most sense. In Github, click the **Clone or download** button, and then click **Download ZIP**.
+First download or clone the theme from the [Github repo](https://github.com/tomjoht/documentation-theme-jekyll). Most likely you won't be pulling in updates once you start customizing the theme, so downloading the theme (instead of cloning it) probably makes the most sense. In Github, click the **Clone or download** button, and then click **Download ZIP**.
 
 ### 2. Install Jekyll
 
@@ -74,16 +76,11 @@ If you want to shorten this long command, you can put this code in a file such a
 ## Running the site in Docker
 
 You can also use Docker to directly build and run the site on your local machine. Just clone the repo and run the following from your working dir:
+```
+docker-compose build --no-cache && docker-compose up
+```
+The site should now be running at [http://localhost:4000/](http://localhost:4000/).
 
-```
-docker build --no-cache -t mydocs .
-```
-
-Once the build is complete, you can mount and run the whole site as follows:
-
-```
-docker run -v "$PWD:/src" -p 4000:4000 mydocs serve -H 0.0.0.0
-```
 This is perhaps the easiest way to see how your site would actually look.
 
 ## Configure the sidebar
